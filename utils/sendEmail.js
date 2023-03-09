@@ -3,12 +3,12 @@ console.log(process.env.SMPT_PORT);
 const sendEmail = async (options) => {
   const transporter = nodeMailer.createTransport({
     host: "smtp.gmail.com",
-    port: 587,
+    port: process.env.SMPT_PORT,
     secure: false,
     service: "gmail",
     auth: {
       user: "priyam.saha2003@gmail.com",
-      pass: "gnrtlqfqznbbmngp",
+      pass: process.env.SMPT_PASSWORD,
     },
   });
 
