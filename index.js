@@ -15,7 +15,13 @@ console.log(process.env.SMPT_MAIL);
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+app.set("trust proxy", 1);
 // Route Imports
 
 const user = require("./routes/userRoute");

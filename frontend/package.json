@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:4000",
   "dependencies": {
     "@hookform/resolvers": "^2.9.11",
     "@reduxjs/toolkit": "^1.9.3",

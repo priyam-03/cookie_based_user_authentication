@@ -26,36 +26,23 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 201, res);
 });
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
+  var avatar = null;
+  if (req.file === undefined) {
+    const user = req.user.id;
+    avatar = req.user.avatar;
+  } else {
+    avatar = {
+      fileName: req.file.originalname,
+      filePath: req.file.path,
+      fileType: req.file.mimetype,
+      fileSize: fileSizeFormatter(req.file.size, 2),
+    };
+  }
   const newUserData = {
     name: req.body.name,
     email: req.body.email,
-    // avatar: {
-    //   fileName: req.file.originalname,
-    //   filePath: req.file.path,
-    //   fileType: req.file.mimetype,
-    //   fileSize: fileSizeFormatter(req.file.size, 2),
-    // },
+    avatar,
   };
-
-  // if (req.body.avatar !== "") {
-  //   const user = await User.findById(req.user.id);
-
-  //   const imageId = user.avatar.public_id;
-
-  //   await cloudinary.v2.uploader.destroy(imageId);
-
-  //   const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-  //     folder: "avatars",
-  //     width: 150,
-  //     crop: "scale",
-  //   });
-
-  //   newUserData.avatar = {
-  //     public_id: myCloud.public_id,
-  //     url: myCloud.secure_url,
-  //   };
-  // }
-
   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
@@ -125,11 +112,9 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
 
-  const resetPasswordUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/password/reset/${resetToken}`;
+  const resetPasswordUrl = `${req.protocol}://localhost:3000/resetpassword/${resetToken}`;
   console.log(resetPasswordUrl);
-  const text = `<h1>Your password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it.</h1>`;
+  const text = `Your password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it.`;
   console.log(user.email);
   try {
     await sendEmail({
@@ -175,11 +160,13 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  if (req.body.password !== req.body.confirmPassword) {
-    return next(new ErrorHander("Password does not password", 400));
+  if (req.body.newPassword !== req.body.confirmPassword) {
+    return next(
+      new ErrorHander("Password does not match confirmpassword", 400)
+    );
   }
 
-  user.password = req.body.password;
+  user.password = req.body.newPassword;
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
 

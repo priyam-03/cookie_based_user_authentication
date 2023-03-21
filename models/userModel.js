@@ -51,8 +51,8 @@ const userSchema = new mongoose.Schema(
       default: Date.now,
     },
 
-    // resetPasswordToken: String,
-    // resetPasswordExpire: Date,
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   { timestamps: true }
 );
@@ -79,19 +79,19 @@ userSchema.methods.comparePassword = async function (password) {
 };
 
 // Generating Password Reset Token
-// userSchema.methods.getResetPasswordToken = function () {
-//   // Generating Token
-//   const resetToken = crypto.randomBytes(20).toString("hex");
+userSchema.methods.getResetPasswordToken = function () {
+  // Generating Token
+  const resetToken = crypto.randomBytes(20).toString("hex");
 
-//   // Hashing and adding resetPasswordToken to userSchema
-//   this.resetPasswordToken = crypto
-//     .createHash("sha256")
-//     .update(resetToken)
-//     .digest("hex");
+  // Hashing and adding resetPasswordToken to userSchema
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
 
-//   this.resetPasswordExpire = Date.now() + 15 * 60 * 10000;
+  this.resetPasswordExpire = Date.now() + 15 * 60 * 10000;
 
-//   return resetToken;
-// };
+  return resetToken;
+};
 
 module.exports = mongoose.model("Userauth", userSchema);
